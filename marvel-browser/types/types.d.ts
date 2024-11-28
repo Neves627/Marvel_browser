@@ -1,3 +1,4 @@
+// types.d.ts
 export interface Comic {
     id: number;
     title: string;
@@ -5,7 +6,6 @@ export interface Comic {
       path: string;
       extension: string;
     };
-    // Check if onsaleDate is present here
-    onsaleDate: string; // This should be added if it's missing
+    onsaleDate?: string; // Make this optional if it's not needed
   }
   
