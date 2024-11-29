@@ -11,7 +11,6 @@ export default function Home() {
   const [comics, setComics] = useState<Comic[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [filteredComics, setFilteredComics] = useState<Comic[]>([]);
-  const [error, setError] = useState<string | null>(null);
   const [showFavorites, setShowFavorites] = useState(false);
 
   const { addFavorite, removeFavorite, favorites, setFavoritesFromLocalStorage } = useStore();
@@ -20,7 +19,6 @@ export default function Home() {
     fetchMarvelData<Comic>('comics', { orderBy: '-modified', limit: 30 })
       .then((data) => setComics(data.data.results))
       .catch((error) => {
-        setError('Failed to fetch comics. Please try again later.');
         console.error(error.response?.data || error.message);
       });
 
