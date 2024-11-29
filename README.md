@@ -18,3 +18,14 @@ TailwindCSS: A utility-first CSS framework for rapid UI development.
 Zustand: A small, fast state-management library for React.
 Marvel API: Used to fetch comic book data from Marvel's official API.
 Vercel: For easy deployment.
+
+Run locally:
+
+1. Clone Repository:
+ git clone https://github.com/Neves627/Marvel_browser.git
+
+2. Enter in the directory:
+ cd  cd marvel-browser
+
+3. Start the server:
+ npm run dev
