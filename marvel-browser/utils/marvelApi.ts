@@ -6,10 +6,7 @@ const privateKey = 'e22c202a871c9283f19e8c7ec7c6e8c825cd1d34';
 
 const baseURL = 'https://gateway.marvel.com/v1/public'; 
 
-export const fetchMarvelData = async <T>(
-  endpoint: string,
-  params = {}
-): Promise<{ data: { results: T[] } }> => {
+export const fetchMarvelData = async <T>(endpoint: string, params = {}) => {
   const timestamp = new Date().getTime(); 
   const hash = md5(`${timestamp}${privateKey}${publicKey}`); 
 

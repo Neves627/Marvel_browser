@@ -5,39 +5,44 @@ import { Comic } from '../types/types';
 import { fetchMarvelData } from '../utils/marvelApi';
 import useStore from './store'; 
 import TopBar from '@/components/topbar';
-
+import ComicCard from '@/components/ComicCard';
 
 export default function Home() {
   const [comics, setComics] = useState<Comic[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
-  const [filteredComics, setFilteredComics] = useState<Comic[]>([]);
   const [showFavorites, setShowFavorites] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1); 
+  const comicsPerPage = 12; 
 
   const { addFavorite, removeFavorite, favorites, setFavoritesFromLocalStorage } = useStore();
 
   useEffect(() => {
-    fetchMarvelData<Comic>('comics', { orderBy: '-modified', limit: 30 })
-      .then((data) => setComics(data.data.results))
-      .catch((error) => {
-        console.error(error.response?.data || error.message);
-      });
+    const params: any = {
+      orderBy: '-modified', 
+      limit: comicsPerPage, 
+      offset: (currentPage - 1) * comicsPerPage,
+    };
+
+    if (searchTerm) {
+      params.title = searchTerm; 
+    }
+
+    fetchMarvelData<Comic>('comics', params)
+      .then((data) => {
+        setComics(data.data.results);
+        setTotalPages(Math.ceil(data.data.total / comicsPerPage)); 
+      })
+      .catch((error) => console.error('API Request Error:', error)); 
 
     setFavoritesFromLocalStorage();
-  }, [setFavoritesFromLocalStorage]);
+  }, [setFavoritesFromLocalStorage, currentPage, searchTerm]); 
 
-  useEffect(() => {
-    if (searchTerm === '') {
-      setFilteredComics(comics);
-    } else {
-      setFilteredComics(
-        comics.filter((comic) =>
-          comic.title.toLowerCase().includes(searchTerm.toLowerCase())
-        )
-      );
+  const handlePageChange = (page: number) => {
+    if (page > 0 && page <= totalPages) {
+      setCurrentPage(page);
     }
-  }, [searchTerm, comics]);
-
-  const comicsToDisplay = showFavorites ? favorites : filteredComics;
+  };
 
   return (
     <div className="p-4">
@@ -63,45 +68,45 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
-          {comicsToDisplay.length > 0 ? (
-            comicsToDisplay.map((comic) => (
-              <div key={comic.id} className="bg-white shadow rounded p-4">
-                <img
-                  src={`${comic.thumbnail.path}.${comic.thumbnail.extension}`}
-                  alt={comic.title}
-                  className="w-full h-auto"
-                />
-                <h2 className="text-lg font-semibold mt-2 text-black">{comic.title}</h2>
-
-                <div
-                  className="mt-2 cursor-pointer"
-                  onClick={() =>
-                    favorites.some((fav) => fav.id === comic.id)
-                      ? removeFavorite(comic)
-                      : addFavorite(comic)
-                  }
-                >
-                  {favorites.some((fav) => fav.id === comic.id) ? (
-                    <img
-                      src="/heart_filled.png"
-                      alt="Filled Heart"
-                      className="w-8 h-8"
-                    />
-                  ) : (
-                    <img
-                      src="/heart_empty.png"
-                      alt="Empty Heart"
-                      className="w-8 h-8"
-                    />
-                  )}
-                </div>
-              </div>
+          {comics.length > 0 ? (
+            comics.map((comic) => (
+              <ComicCard
+                key={comic.id}
+                comic={comic}
+                favorites={favorites}
+                addFavorite={addFavorite}
+                removeFavorite={removeFavorite}
+              />
             ))
           ) : (
             <div className="col-span-3 text-center text-gray-500">
               {showFavorites ? 'No favorite comics added' : 'No comics found'}
             </div>
           )}
+        </div>
+
+        {/* Footer with pagination */}
+        <div className="mt-6 flex justify-between items-center">
+          <div className="text-gray-500">
+            {`Page ${currentPage} of ${totalPages}`}
+          </div>
+
+          <div className="flex space-x-2">
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="p-2 bg-blue-500 text-white rounded disabled:bg-gray-300"
+            >
+              Previous
+            </button>
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="p-2 bg-blue-500 text-white rounded disabled:bg-gray-300"
+            >
+              Next
+            </button>
+          </div>
         </div>
       </div>
     </div>
