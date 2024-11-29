@@ -44,6 +44,8 @@ export default function Home() {
     }
   };
 
+  const comicsToDisplay = showFavorites ? favorites : comics;
+
   return (
     <div className="p-4">
       {/* Topbar */}
@@ -68,8 +70,8 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
-          {comics.length > 0 ? (
-            comics.map((comic) => (
+          {comicsToDisplay.length > 0 ? (
+            comicsToDisplay.map((comic) => (
               <ComicCard
                 key={comic.id}
                 comic={comic}
