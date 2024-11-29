@@ -24,15 +24,17 @@ const useStore = create<Store>((set) => ({
     }
   },
 
+  // Add favorites to the localStorage
   addFavorite: (comic: Comic) => set((state) => {
     const updatedFavorites = [...state.favorites, comic];
-    localStorage.setItem('favorites', JSON.stringify(updatedFavorites)); // Save to localStorage
+    localStorage.setItem('favorites', JSON.stringify(updatedFavorites)); 
     return { favorites: updatedFavorites };
   }),
 
+  // Remove a favorite from the localStorage
   removeFavorite: (comic: Comic) => set((state) => {
     const updatedFavorites = state.favorites.filter(fav => fav.id !== comic.id);
-    localStorage.setItem('favorites', JSON.stringify(updatedFavorites)); // Save to localStorage
+    localStorage.setItem('favorites', JSON.stringify(updatedFavorites)); 
     return { favorites: updatedFavorites };
   }),
 }));
